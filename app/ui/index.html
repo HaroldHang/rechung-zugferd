@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Rechnung Konverter (Offline)</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <h1>Rechnung Konverter</h1>
+      <div class="status">
+        <span id="statusText">Bereit</span>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="panel" id="uploadPanel">
+        <h2>Datei hochladen</h2>
+        <div id="dropzone" class="dropzone">
+          <p>Ziehe eine Datei hierher oder klicke zum Auswählen</p>
+          <input type="file" id="fileInput" />
+        </div>
+        <button id="processBtn">Verarbeiten</button>
+        <div id="progress" class="progress" hidden>
+          <div class="spinner"></div>
+          <span>Verarbeite...</span>
+        </div>
+      </section>
+
+      <section class="panel" id="resultsPanel">
+        <h2>Ergebnisse</h2>
+        <div id="lastOutputPath" class="hint"></div>
+        <ul id="results"></ul>
+      </section>
+
+      <section class="panel" id="settingsPanel">
+        <h2>Einstellungen</h2>
+        <form id="settingsForm">
+          <label>
+            LLM Modellpfad
+            <input type="text" name="llm_model_path" id="llmModelPath" placeholder="Pfad zur .gguf Datei" />
+          </label>
+          <label>
+            Logo-Pfad
+            <input type="text" name="logo_path" id="logoPath" placeholder="Pfad zum Firmenlogo (optional)" />
+          </label>
+          <button type="submit">Einstellungen speichern</button>
+        </form>
+      </section>
+
+      <section class="panel" id="firmPanel">
+        <h2>Firmendaten</h2>
+        <form id="firmForm">
+          <label>Firmenname <input type="text" name="name" id="firmName" /></label>
+          <label>USt-IdNr <input type="text" name="umsatzsteuer_id" id="ustId" /></label>
+          <label>Steuernummer <input type="text" name="steuernummer" id="steuerNr" /></label>
+          <fieldset>
+            <legend>Anschrift</legend>
+            <label>Straße <input type="text" name="strasse" id="strasse" /></label>
+            <label>PLZ <input type="text" name="plz" id="plz" /></label>
+            <label>Ort <input type="text" name="ort" id="ort" /></label>
+            <label>Land <input type="text" name="land" id="land" /></label>
+          </fieldset>
+          <fieldset>
+            <legend>Zahlung</legend>
+            <label>Zahlungsart <input type="text" name="zahlungsart" id="zahlungsart" /></label>
+            <label>IBAN <input type="text" name="iban" id="iban" /></label>
+            <label>BIC <input type="text" name="bic" id="bic" /></label>
+          </fieldset>
+          <button type="submit">Firmendaten speichern</button>
+        </form>
+      </section>
+    </main>
+
+    <script src="/app.js"></script>
+  </body>
+</html>

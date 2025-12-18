@@ -1,0 +1,152 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "KanonischeRechnung",
+  "type": "object",
+  "required": [
+    "dokument",
+    "verkaeufer",
+    "kaeufer",
+    "positionen",
+    "summen",
+    "zahlung"
+  ],
+  "properties": {
+    "dokument": {
+      "type": "object",
+      "required": [
+        "rechnungsnummer",
+        "rechnungsart",
+        "rechnungsdatum",
+        "waehrung"
+      ],
+      "properties": {
+        "rechnungsnummer": { "type": "string" },
+        "rechnungsart": { "type": "string", "enum": ["RECHNUNG", "GUTSCHRIFT"] },
+        "rechnungsdatum": { "type": "string", "format": "date" },
+        "faelligkeitsdatum": { "type": "string", "format": "date" },
+        "waehrung": { "type": "string", "enum": ["EUR"] }
+      }
+    },
+
+    "verkaeufer": {
+      "type": "object",
+      "required": ["name", "anschrift"],
+      "properties": {
+        "name": { "type": "string" },
+        "umsatzsteuer_id": { "type": "string" },
+        "steuernummer": { "type": "string" },
+        "anschrift": {
+          "type": "object",
+          "required": ["strasse", "plz", "ort", "land"],
+          "properties": {
+            "strasse": { "type": "string" },
+            "plz": { "type": "string" },
+            "ort": { "type": "string" },
+            "land": { "type": "string", "minLength": 2, "maxLength": 2 }
+          }
+        }
+      }
+    },
+
+    "kaeufer": {
+      "type": "object",
+      "required": ["name", "anschrift"],
+      "properties": {
+        "name": { "type": "string" },
+        "anschrift": {
+          "type": "object",
+          "required": ["strasse", "plz", "ort", "land"],
+          "properties": {
+            "strasse": { "type": "string" },
+            "plz": { "type": "string" },
+            "ort": { "type": "string" },
+            "land": { "type": "string", "minLength": 2, "maxLength": 2 }
+          }
+        }
+      }
+    },
+
+    "positionen": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "positionsnummer",
+          "beschreibung",
+          "menge",
+          "einheit",
+          "einzelpreis_netto",
+          "positionsbetrag_netto",
+          "umsatzsteuer"
+        ],
+        "properties": {
+          "positionsnummer": { "type": "integer" },
+          "beschreibung": { "type": "string" },
+          "menge": { "type": "number" },
+          "einheit": { "type": "string" },
+          "einzelpreis_netto": { "type": "number" },
+          "positionsbetrag_netto": { "type": "number" },
+          "umsatzsteuer": {
+            "type": "object",
+            "required": ["kategorie", "satz"],
+            "properties": {
+              "kategorie": { "type": "string" },
+              "satz": { "type": "number" }
+            }
+          }
+        }
+      }
+    },
+
+    "umsatzsteuer_aufschluesselung": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["kategorie", "satz", "steuerbasisbetrag", "steuerbetrag"],
+        "properties": {
+          "kategorie": { "type": "string" },
+          "satz": { "type": "number" },
+          "steuerbasisbetrag": { "type": "number" },
+          "steuerbetrag": { "type": "number" }
+        }
+      }
+    },
+
+    "summen": {
+      "type": "object",
+      "required": [
+        "gesamt_netto",
+        "gesamt_umsatzsteuer",
+        "gesamt_brutto",
+        "zahlbetrag"
+      ],
+      "properties": {
+        "gesamt_netto": { "type": "number" },
+        "gesamt_umsatzsteuer": { "type": "number" },
+        "gesamt_brutto": { "type": "number" },
+        "zahlbetrag": { "type": "number" }
+      }
+    },
+
+    "zahlung": {
+      "type": "object",
+      "required": ["zahlungsart"],
+      "properties": {
+        "zahlungsart": { "type": "string" },
+        "iban": { "type": "string" },
+        "bic": { "type": "string" }
+      }
+    },
+
+    "bemerkungen": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "text": { "type": "string" }
+        }
+      }
+    }
+  }
+}
