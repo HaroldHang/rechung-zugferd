@@ -8,7 +8,7 @@ python-multipart
 ocrmypdf
 pytesseract
 pdfplumber
-#pymupdf==1.24.5
+pymupdf
 python-docx
 openpyxl
 pillow
@@ -22,6 +22,8 @@ xmlschema
 
 # --- PDF Generation ---
 reportlab
+weasyprint
+jinja2
 
 # --- Utilities ---
 python-dateutil

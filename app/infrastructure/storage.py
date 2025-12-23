@@ -9,7 +9,8 @@ FIRMENDATEN_PATH = DATA_DIR / "firmendaten.json"
 
 DEFAULT_SETTINGS: Dict[str, Any] = {
     "output_directory": str((BASE_DIR / "output").resolve()),
-    "llm_model_path": str((BASE_DIR / "models" / "model.gguf").resolve()),
+    "llm_model_path": str((BASE_DIR / "models" / "Qwen2.5-VL-7B-Instruct-Q5_K_M.gguf").resolve()),
+    "clip_model_path": str((BASE_DIR / "models" / "mmproj-F32.gguf").resolve()),
     "logo_path": "",
 }
 

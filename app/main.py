@@ -7,6 +7,9 @@ import uvicorn
 import shutil
 import uuid
 from typing import Optional
+# load env variables
+from dotenv import load_dotenv
+load_dotenv()
 
 # Local modules
 from app.infrastructure.storage import load_settings, save_settings, load_firmendaten, save_firmendaten

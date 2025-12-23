@@ -1,8 +1,12 @@
 from pathlib import Path
 import json
-from typing import Dict, Any
+from typing import Any, Dict, Union, List
 from loguru import logger
 from llama_cpp import Llama
+import re
+from llama_cpp.llama_chat_format import Qwen25VLChatHandler
+from openai import OpenAI
+import os
 
 SCHEMA_PATH = Path(__file__).resolve().parents[2] / "domain" / "rechnung" / "schema.json"
 PROMPT_TEMPLATE = (
@@ -175,17 +179,44 @@ def build_prompt(raw_text: str, schema_text: str) -> str:
         "<<< INSERT RAW TEXT HERE >>>", raw_text
     )
 
+def call_llm_via_openai(prompt: str, system_prompt: str, schema_text: Dict, model: str = "gpt-4o-mini") -> str:
+    base_url = "https://api.aimlapi.com/v1"
+    api_key = os.getenv("AIMLAPI_API_KEY")
+    if not api_key:
+        raise ValueError("AIMLAPI_API_KEY environment variable not set")
+    client = OpenAI(
+        base_url=base_url,
+        api_key=api_key,
+    )
+    response = client.chat.completions.create(
+        model=model,
+        messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": prompt},
+        ],
+        #response_format={
+        #    "type": "json_object",
+        #    "schema": schema_text,
+        #},
+        temperature=0.7,
+        max_tokens=4096,
+    )
+    print(response)
+    return response.choices[0].message.content
+    
 
-def llm_extract_draft_json(raw_text_path: Path, model_path: Path) -> Dict[str, Any]:
+def llm_extract_draft_json(raw_text_path: Path, model_path: Path, clip_model_path: Path) -> Dict[str, Any]:
     logger.info("Starte LLM für strukturierte JSON-Extraktion")
 
     schema_text = SCHEMA_PATH.read_text(encoding="utf-8")
     raw_text = Path(raw_text_path).read_text(encoding="utf-8", errors="ignore")
     prompt = build_prompt(raw_text, schema_text)
-
+    
     if not model_path.exists():
         raise FileNotFoundError(f"LLM Modell nicht gefunden: {model_path}")
 
+    #chat_handler = Qwen25VLChatHandler(clip_model_path=str(clip_model_path))
+    #llm = Llama(model_path=str(model_path), chat_handler=chat_handler, n_ctx=4096)
     llm = Llama(model_path=str(model_path), n_ctx=4096)
 
     """
@@ -196,13 +227,30 @@ def llm_extract_draft_json(raw_text_path: Path, model_path: Path) -> Dict[str, A
     """
 
     print("start of prompt")
-    output = llm.create_completion(prompt=prompt, temperature=0.0, max_tokens=2048)
+    #output = llm.create_completion(prompt=prompt, temperature=0.7, max_tokens=4096)
+    """
+    output = llm.create_chat_completion(
+        messages=[
+            {"role": "system", "content": "Du bist ein Parser für deutsche Rechnungen, der das Ergebnis in strukturiertem JSON liefert.."},
+            {"role": "user", "content": prompt},
+        ],
+        response_format={
+            "type": "json_object",
+            "schema": schema_text,
+        },
+        temperature=0.7,
+        max_tokens=4096,
+    )
+    """
     text = output["choices"][0]["text"].strip()
+    text = clean_json_string(text)
     text = extract_json_from_text(text)
-    print(output)
+    #text = call_llm_via_openai(prompt, "Du bist ein Parser für deutsche Rechnungen, der das Ergebnis in strukturiertem JSON liefert..", json.dumps(schema_text),)
+    print(text)
     # Ensure it's valid JSON only
     try:
         data = json.loads(text)
+        print(data)
     except Exception as e:
         # Attempt to locate JSON substring
         start = text.find("{")

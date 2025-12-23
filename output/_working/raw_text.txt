@@ -1,65 +1,36 @@
-® Diese Datei verlangt Konformität mit dem PDF/A-Standard und wurde schreibgeschützt geöffnet, um Änderungen zu verhindern.
+RECHNUNG
 
-Name
+Max Musterman — Musterstr. X — 12345 Musterstadt
 
-|9 zugferd-invoice.xml
+Firmenname Empfänger Rechnungsdatum: 01.01.2020
+Name Empfänger
 
-Testlogo
+Straßenname 345
 
-A Design Company
+PLZ Ort
 
-Tescompany Designers 34. 12345 Fanklut
-ABC Versicherung AG Testcompany
-Frau Dr. Ute Schaden Eine Demo Firma
+Land (optional)
 
-Unfallstraße 23 Designerstraße 34
-12345 Hamburg 12345 Frankfurt
+01.01.2020
+RECHNUNG
 
-11.04.2019
+Sehr geehrte Damen und Herren,
 
-Rechnung
+im folgenden der/die erworbene/n Artikel, die ich in Rechnung stelle:
 
-Projekt: Microsite Haftpflichtversicherung
-Projektnummer: 19-10-033 Rechnungsnummer: 19-0002
+Pos. Bezeichnung Menge Einzelpreis Gesamtpreis
+1. Gebrauchtes Mountainbike 1,00 Stk 140,00 € 140,00 €
+2. Gebrauchter Fahrradhelm 1,00 Stk 20,00 € 20,00 €
+Summe Positionen 160,00 €
+Rechnungsbetrag 160,00 €
 
-Sehr geehrte Frau Dr. Schaden,
+Zahlungsbedingungen: Barzahlung bei Abholung.
 
-wir erlauben uns aufgrund der erbrachten Leistungen zu berechnen:
+Mit freundlichen Grüßen
 
-Pos. Leistung Einzelpreis Betrag
+Nılak,
 
-1 Beratung bei Konzeption und Struktur der Website. X 95.00 € 570,00. €
-Kommunikation und Handling.
+Max Muster
 
-Gestaltung der Website unter Berücksichtigung des . 95,00€ 1.140,00 €
-Corporate Designs. Abstimmung mittels statischer
-Bilddateien.
-
-Programmierung der abgestimmten Seitenvorlagen für das , . 1.800,00 €
-Content Management System.
-
-Fremdleistung
-
-4 Hosting der Website auf einem leistungsfähigen Server. . 180,00 €
-
-Kosten pro Monat: 15, €
-Laufzeit: 1 Jahr
-
-Summe (netto): 3.690,00 €
-MwSt. (19,0%): 701,10€
-
-Gesamtbetrag (brutto): 4.391,10€
-
-Leistungszeitraum: 17.03.2019 bis 09.04.2019
-Die Rechnung ist zahlbar innerhalb von 30 Tagen ohne Abzug, Bitte geben Sie als Betreff die Rechnungsnummer 19-0002 an.
-
-Mit freundlichen Grüßen,
-Ihre Testfirma
-
-Rechnung 19-0002 | Seite 1 von 1
-
-Testcompany Amtsgericht Frankfurt Bankverbindung
-vmtestcompanyde HRB 1234 DE12 12341234 1234 1231 12
-mail@testcompany.de USt ID-Nr. 123456 Bankname
-
-BICTESTBANKOT
+Diese Vorlage
+wurde erstellt von:

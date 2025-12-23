@@ -14,14 +14,14 @@ class Dokument(BaseModel):
     rechnungsnummer: str
     rechnungsart: str
     rechnungsdatum: date
-    faelligkeitsdatum: Optional[date]
+    faelligkeitsdatum: Optional[date] = None
     waehrung: str = "EUR"
 
 
 class Partei(BaseModel):
     name: str
-    umsatzsteuer_id: Optional[str]
-    steuernummer: Optional[str]
+    umsatzsteuer_id: Optional[str] = None
+    steuernummer: Optional[str] = None
     anschrift: Anschrift
 
 
@@ -56,8 +56,8 @@ class Summen(BaseModel):
 
 class Zahlung(BaseModel):
     zahlungsart: str
-    iban: Optional[str]
-    bic: Optional[str]
+    iban: Optional[str] = None
+    bic: Optional[str] = None
 
 
 class Bemerkung(BaseModel):
@@ -69,7 +69,7 @@ class Rechnung(BaseModel):
     verkaeufer: Partei
     kaeufer: Partei
     positionen: List[Rechnungsposition]
-    umsatzsteuer_aufschluesselung: Optional[List[UmsatzsteuerAufschluesselung]]
+    umsatzsteuer_aufschluesselung: Optional[List[UmsatzsteuerAufschluesselung]] = None
     summen: Summen
     zahlung: Zahlung
-    bemerkungen: Optional[List[Bemerkung]]
+    bemerkungen: Optional[List[Bemerkung]] = None

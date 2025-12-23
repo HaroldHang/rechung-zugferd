@@ -30,8 +30,8 @@ def process_input_file(input_path: Path, output_root: Path, settings: Dict[str, 
     # 2) LLM → draft JSON
     llm_model_path = Path(settings.get("llm_model_path", "./models/model.gguf"))
     print(llm_model_path)
-    draft_json = llm_extract_draft_json(raw_text_path=raw_text_path, model_path=llm_model_path)
-
+    clip_model_path = Path(settings.get("clip_model_path", "models/mmproj-F32.gguf"))
+    draft_json = llm_extract_draft_json(raw_text_path=raw_text_path, model_path=llm_model_path, clip_model_path=clip_model_path)
     # 3) Validation & Normalization → canonical Rechnung
     canonical: Rechnung = validate_and_normalize(draft_json)
 
@@ -56,7 +56,8 @@ def process_input_file(input_path: Path, output_root: Path, settings: Dict[str, 
     # PDF/A-3 with embedded ZUGFeRD XML
     logo_path = settings.get("logo_path") or ""
     pdf_path = out_dir / "zugferd.pdf"
-    generate_pdf_a3_with_xml(canonical, zugferd_xml_path, pdf_path, logo_path=logo_path)
+    #print(canonical.model_dump())
+    generate_pdf_a3_with_xml(canonical.model_dump(), zugferd_xml_path, pdf_path, logo_path=logo_path)
 
     return {
         "status": "success",

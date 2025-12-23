@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <title>Rechnung {{ dokument.rechnungsnummer }}</title>
+
+  <style>
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 10pt;
+      color: #000;
+    }
+
+    h1 {
+      font-size: 16pt;
+      margin-bottom: 10px;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 30px;
+    }
+
+    .block {
+      width: 48%;
+    }
+
+    .block strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th, td {
+      border: 1px solid #999;
+      padding: 5px;
+      vertical-align: top;
+    }
+
+    th {
+      background: #f0f0f0;
+      text-align: left;
+    }
+
+    .right {
+      text-align: right;
+    }
+
+    .totals {
+      width: 40%;
+      margin-left: auto;
+      margin-top: 20px;
+    }
+
+    .totals td {
+      border: none;
+      padding: 4px;
+    }
+
+    .totals .label {
+      text-align: right;
+    }
+
+    .totals .value {
+      text-align: right;
+      font-weight: bold;
+    }
+
+    .small {
+      font-size: 9pt;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Rechnung</h1>
+
+<div class="header">
+  <!-- Verkäufer -->
+  <div class="block">
+    <strong>{{ verkaeufer.name }}</strong>
+    {{ verkaeufer.anschrift.strasse }}<br>
+    {{ verkaeufer.anschrift.plz }} {{ verkaeufer.anschrift.ort }}<br>
+    {{ verkaeufer.anschrift.land }}<br><br>
+
+    {% if verkaeufer.umsatzsteuer_id %}
+      USt-IdNr: {{ verkaeufer.umsatzsteuer_id }}<br>
+    {% endif %}
+    {% if verkaeufer.steuernummer %}
+      Steuernummer: {{ verkaeufer.steuernummer }}
+    {% endif %}
+  </div>
+
+  <!-- Käufer -->
+  <div class="block">
+    <strong>{{ kaeufer.name }}</strong>
+    {{ kaeufer.anschrift.strasse }}<br>
+    {{ kaeufer.anschrift.plz }} {{ kaeufer.anschrift.ort }}<br>
+    {{ kaeufer.anschrift.land }}<br><br>
+
+    {% if kaeufer.umsatzsteuer_id %}
+      USt-IdNr: {{ kaeufer.umsatzsteuer_id }}<br>
+    {% endif %}
+    {% if kaeufer.steuernummer %}
+      Steuernummer: {{ kaeufer.steuernummer }}
+    {% endif %}
+  </div>
+</div>
+
+<!-- Dokumentinfos -->
+<p>
+  <strong>Rechnungsnummer:</strong> {{ dokument.rechnungsnummer }}<br>
+  <strong>Rechnungsdatum:</strong> {{ dokument.rechnungsdatum }}<br>
+  {% if dokument.faelligkeitsdatum %}
+    <strong>Fälligkeitsdatum:</strong> {{ dokument.faelligkeitsdatum }}<br>
+  {% endif %}
+  <strong>Währung:</strong> {{ dokument.waehrung }}
+</p>
+
+<!-- Positionen -->
+<table>
+  <thead>
+    <tr>
+      <th>Pos</th>
+      <th>Beschreibung</th>
+      <th>Menge</th>
+      <th>Einheit</th>
+      <th>Einzelpreis (netto)</th>
+      <th>MwSt %</th>
+      <th>Betrag (netto)</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for p in positionen %}
+    <tr>
+      <td class="right">{{ p.positionsnummer }}</td>
+      <td>{{ p.beschreibung }}</td>
+      <td class="right">{{ "%.2f"|format(p.menge) }}</td>
+      <td>{{ p.einheit }}</td>
+      <td class="right">{{ "%.2f"|format(p.einzelpreis_netto) }}</td>
+      <td class="right">{{ "%.2f"|format(p.umsatzsteuer.satz) }}</td>
+      <td class="right">{{ "%.2f"|format(p.positionsbetrag_netto) }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<!-- Summen -->
+<table class="totals">
+  <tr>
+    <td class="label">Gesamt netto:</td>
+    <td class="value">{{ "%.2f"|format(summen.gesamt_netto) }} {{ dokument.waehrung }}</td>
+  </tr>
+  <tr>
+    <td class="label">Umsatzsteuer:</td>
+    <td class="value">{{ "%.2f"|format(summen.gesamt_umsatzsteuer) }} {{ dokument.waehrung }}</td>
+  </tr>
+  <tr>
+    <td class="label">Gesamt brutto:</td>
+    <td class="value">{{ "%.2f"|format(summen.gesamt_brutto) }} {{ dokument.waehrung }}</td>
+  </tr>
+  <tr>
+    <td class="label">Zahlbetrag:</td>
+    <td class="value">{{ "%.2f"|format(summen.zahlbetrag) }} {{ dokument.waehrung }}</td>
+  </tr>
+</table>
+
+<!-- Zahlung -->
+{% if zahlung %}
+<p class="small">
+  <strong>Zahlungsart:</strong> {{ zahlung.zahlungsart }}<br>
+  {% if zahlung.iban %}IBAN: {{ zahlung.iban }}<br>{% endif %}
+  {% if zahlung.bic %}BIC: {{ zahlung.bic }}{% endif %}
+</p>
+{% endif %}
+
+<!-- Bemerkungen -->
+{% if bemerkungen %}
+<p class="small">
+  <strong>Bemerkungen:</strong><br>
+  {{ bemerkungen }}
+</p>
+{% endif %}
+
+</body>
+</html>
