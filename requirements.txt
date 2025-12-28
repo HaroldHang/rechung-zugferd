@@ -28,3 +28,4 @@ jinja2
 # --- Utilities ---
 python-dateutil
 loguru
+openai
