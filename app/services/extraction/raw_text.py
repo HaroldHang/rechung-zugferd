@@ -33,6 +33,7 @@ def extract_raw_text_to_file(input_path: Union[str, Path], dest_dir: Union[str, 
         raise ValueError(f"Nicht unterstütztes Format: {suffix}")
 
     text = sanitize_text(text)
+    print(text)
     out_path = dest_dir / "raw_text.txt"
     out_path.write_text(text, encoding="utf-8")
     return out_path

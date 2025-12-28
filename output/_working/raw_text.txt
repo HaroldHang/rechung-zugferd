@@ -1,36 +1,52 @@
-RECHNUNG
+Muster GmbH Lange Str. 2 | 10245 Berlin
+Habermann & Söhne
+Schnurlos-Straße 81
+34131 Kassel
+Muster GmbH
+Lange Str. 2
+10245 Berlin
++49 (0) 30 2121356
+mail@muster.de
+www.muster.de
 
-Max Musterman — Musterstr. X — 12345 Musterstadt
+Rechnung
 
-Firmenname Empfänger Rechnungsdatum: 01.01.2020
-Name Empfänger
+Rechnungs-Nr.:	M1675
+Auftrags-Nr.:	O1727
+Kommission:	Bestellung Gerstner
+Kunden-Nr.:	1068
+Bestell-Nr.:	369852
+Rechnungsdatum:		20.12.2025
+Liefer-/Leistungsdatum:	22.12.2025
+Bearbeiter:		Dorothea Schäfer
+Telefon:		030 2121359
+E-Mail:		mail@muster.de
 
-Straßenname 345
 
-PLZ Ort
 
-Land (optional)
 
-01.01.2020
-RECHNUNG
+Lieferbedingung: frei Haus
+Zahlbar innerhalb von 14 Tagen mit 3 % Skonto oder innerhalb von 30 Tagen ohne Abzug
 
-Sehr geehrte Damen und Herren,
 
-im folgenden der/die erworbene/n Artikel, die ich in Rechnung stelle:
 
-Pos. Bezeichnung Menge Einzelpreis Gesamtpreis
-1. Gebrauchtes Mountainbike 1,00 Stk 140,00 € 140,00 €
-2. Gebrauchter Fahrradhelm 1,00 Stk 20,00 € 20,00 €
-Summe Positionen 160,00 €
-Rechnungsbetrag 160,00 €
 
-Zahlungsbedingungen: Barzahlung bei Abholung.
 
-Mit freundlichen Grüßen
 
-Nılak,
 
-Max Muster
 
-Diese Vorlage
-wurde erstellt von:
+
+
+
+Pos.; Art-Nr.; Bezeichnung; Menge; Einheit; Preis/Einh. (€); Gesamt (€)
+1; B-3025-078; B-3025, Farbe Grün
+Musterartikel; 1,00; Stk.; 47,00; 47,00
+2; B-0050-050; B-0050, Farbe Blau
+Musterartikel ABC; 2,00; Stk.; 36,00; 72,00
+3; A-0086-007; A-0086, Antik-Look
+Musterartikel; 1,00; Stk.; 56,00; 56,00
+3; V-13kg; Versand und Verpackung; 1,00; Stk.; 11,99; 11,99
+; ; ; ; ; ;
+; ; ; ; Summe Netto; Summe Netto; € 186,99
+; ; ; ; 19,00% USt. auf 186,99 €; 19,00% USt. auf 186,99 €; € 35,53
+; ; ; ; Endsumme; Endsumme; € 222,51

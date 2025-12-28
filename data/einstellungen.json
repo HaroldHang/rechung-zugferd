@@ -1,6 +1,7 @@
 {
   "output_directory": "D:\\Codes and projects\\Programming Projects\\rechung-zugferd\\output",
   "llm_model_path": "D:\\Codes and projects\\Programming Projects\\rechung-zugferd\\models\\model.gguf",
+  "clip_model_path": "D:\\Codes and projects\\Programming Projects\\rechung-zugferd\\models\\mmproj-F32.gguf",
   "logo_path": "",
-  "last_output_path": "D:\\Codes and projects\\Programming Projects\\rechung-zugferd\\output\\1"
+  "last_output_path": "D:\\Codes and projects\\Programming Projects\\rechung-zugferd\\output\\M1675"
 }

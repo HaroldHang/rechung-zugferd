@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rechnung Konverter – KI-gestützte E-Rechnungserstellung</title>
+  <script src="/static/vue.global.prod.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      background-color: #f5f5f5;
+      color: #1a1a1a;
+      line-height: 1.5;
+    }
+
+    .top-bar {
+      background-color: #ffffff;
+      border-bottom: 1px solid #e0e0e0;
+      padding: 16px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .top-bar-left h1 {
+      font-size: 20px;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-bottom: 2px;
+    }
+
+    .top-bar-left p {
+      font-size: 13px;
+      color: #6b7280;
+    }
+
+    .btn-settings {
+      background: none;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      padding: 8px 16px;
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #374151;
+      transition: background-color 0.2s;
+    }
+
+    .btn-settings:hover {
+      background-color: #f9fafb;
+    }
+
+    .main-container {
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 24px;
+      padding: 24px 32px;
+      max-width: 1400px;
+      margin: 0 auto;
+      min-height: calc(100vh - 80px);
+    }
+
+    .card {
+      background-color: #ffffff;
+      border-radius: 8px;
+      border: 1px solid #e0e0e0;
+      padding: 24px;
+    }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .upload-zone {
+      border: 2px dashed #d0d5dd;
+      border-radius: 8px;
+      padding: 40px 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background-color 0.2s;
+      margin-bottom: 16px;
+    }
+
+    .upload-zone:hover {
+      border-color: #22c55e;
+      background-color: #f0fdf4;
+    }
+
+    .upload-zone.dragover {
+      border-color: #22c55e;
+      background-color: #f0fdf4;
+    }
+
+    .upload-zone.processing {
+      opacity: 0.6;
+      pointer-events: none;
+    }
+
+    .upload-icon {
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 12px;
+      background-color: #f0fdf4;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .upload-icon svg {
+      width: 24px;
+      height: 24px;
+      color: #22c55e;
+    }
+
+    .upload-zone h3 {
+      font-size: 14px;
+      font-weight: 500;
+      color: #1a1a1a;
+      margin-bottom: 4px;
+    }
+
+    .upload-zone p {
+      font-size: 12px;
+      color: #6b7280;
+    }
+
+    .formats-list {
+      margin-top: 8px;
+      font-size: 11px;
+      color: #9ca3af;
+    }
+
+    .status-box {
+      margin-top: 20px;
+      padding: 12px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .status-idle {
+      background-color: #f9fafb;
+      color: #6b7280;
+    }
+
+    .status-processing {
+      background-color: #fef3c7;
+      color: #92400e;
+    }
+
+    .status-success {
+      background-color: #d1fae5;
+      color: #065f46;
+    }
+
+    .status-error {
+      background-color: #fee2e2;
+      color: #991b1b;
+    }
+
+    .spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid currentColor;
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .right-panel {
+      overflow-y: auto;
+    }
+
+    .result-section {
+      margin-bottom: 24px;
+    }
+
+    .result-section h3 {
+      font-size: 14px;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-bottom: 12px;
+    }
+
+    .result-files {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .result-file {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      background-color: #f9fafb;
+      border-radius: 6px;
+      text-decoration: none;
+      color: #1a1a1a;
+      transition: background-color 0.2s;
+      cursor: pointer;
+    }
+
+    .result-file:hover {
+      background-color: #f0f0f0;
+    }
+
+    .result-file-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .result-file-icon.xml {
+      background-color: #dbeafe;
+      color: #1d4ed8;
+    }
+
+    .result-file-icon.pdf {
+      background-color: #fce7f3;
+      color: #be185d;
+    }
+
+    .result-file-icon.json {
+      background-color: #fef3c7;
+      color: #d97706;
+    }
+
+    .result-file-icon.txt {
+      background-color: #e0e7ff;
+      color: #4338ca;
+    }
+
+    .result-file-info {
+      flex: 1;
+    }
+
+    .result-file-name {
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .result-file-type {
+      font-size: 11px;
+      color: #6b7280;
+    }
+
+    .toggle-section {
+      margin-top: 24px;
+      border-top: 1px solid #e5e7eb;
+      padding-top: 16px;
+    }
+
+    .toggle-btn {
+      background: none;
+      border: none;
+      font-size: 13px;
+      color: #6b7280;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .toggle-btn:hover {
+      color: #374151;
+    }
+
+    .toggle-icon {
+      transition: transform 0.2s;
+    }
+
+    .toggle-icon.open {
+      transform: rotate(90deg);
+    }
+
+    .data-preview {
+      margin-top: 16px;
+      padding: 16px;
+      background-color: #f9fafb;
+      border-radius: 6px;
+      font-size: 12px;
+      font-family: monospace;
+      white-space: pre-wrap;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 24px;
+      color: #9ca3af;
+    }
+
+    .empty-state svg {
+      width: 64px;
+      height: 64px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+
+    .empty-state p {
+      font-size: 14px;
+    }
+
+    /* Modal Styles */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: flex-end;
+      z-index: 1000;
+    }
+
+    .modal-panel {
+      width: 480px;
+      max-width: 100%;
+      background-color: #ffffff;
+      height: 100vh;
+      overflow-y: auto;
+      box-shadow: -4px 0 24px rgba(0, 0, 0, 0.1);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 24px;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .modal-header h2 {
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #6b7280;
+      padding: 4px;
+    }
+
+    .modal-close:hover {
+      color: #1a1a1a;
+    }
+
+    .modal-tabs {
+      display: flex;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .modal-tab {
+      flex: 1;
+      padding: 12px 16px;
+      font-size: 14px;
+      font-weight: 500;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #6b7280;
+      border-bottom: 2px solid transparent;
+      transition: color 0.2s, border-color 0.2s;
+    }
+
+    .modal-tab:hover {
+      color: #374151;
+    }
+
+    .modal-tab.active {
+      color: #22c55e;
+      border-bottom-color: #22c55e;
+    }
+
+    .modal-content {
+      padding: 24px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      color: #374151;
+      margin-bottom: 6px;
+    }
+
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 10px 12px;
+      font-size: 14px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      background-color: #ffffff;
+      color: #1a1a1a;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: #22c55e;
+      box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 12px;
+    }
+
+    .form-section-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-top: 24px;
+      margin-bottom: 16px;
+      padding-top: 16px;
+      border-top: 1px solid #e5e7eb;
+    }
+
+    .form-section-title:first-child {
+      margin-top: 0;
+      padding-top: 0;
+      border-top: none;
+    }
+
+    .modal-footer {
+      padding: 16px 24px;
+      border-top: 1px solid #e0e0e0;
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 20px;
+      font-size: 14px;
+      font-weight: 500;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.2s, opacity 0.2s;
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background-color: #22c55e;
+      color: #ffffff;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background-color: #16a34a;
+    }
+
+    .btn-secondary {
+      background-color: #ffffff;
+      color: #374151;
+      border: 1px solid #d1d5db;
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background-color: #f9fafb;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      padding: 12px 20px;
+      border-radius: 6px;
+      font-size: 14px;
+      z-index: 1001;
+      animation: slideIn 0.3s ease;
+    }
+
+    .toast-success {
+      background-color: #d1fae5;
+      color: #065f46;
+    }
+
+    .toast-error {
+      background-color: #fee2e2;
+      color: #991b1b;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateY(20px);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .main-container {
+        grid-template-columns: 1fr;
+        padding: 16px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app">
+    <header class="top-bar">
+      <div class="top-bar-left">
+        <h1>Rechnung Konverter</h1>
+        <p>Lokale KI-gestützte E-Rechnungserstellung (ZUGFeRD / XRechnung)</p>
+      </div>
+      <button class="btn-settings" @click="showSettings = true">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+        Einstellungen
+      </button>
+    </header>
+
+    <main class="main-container">
+      <aside class="card">
+        <h2 class="card-title">Rechnung hochladen</h2>
+
+        <div class="upload-zone" :class="{ dragover: isDragging, processing: status === 'processing' }"
+          @dragover.prevent="isDragging = true" @dragleave.prevent="isDragging = false" @drop.prevent="handleDrop"
+          @click="triggerFileInput">
+          <div class="upload-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+              stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+            </svg>
+          </div>
+          <h3>Datei hierher ziehen</h3>
+          <p>oder klicken zum Auswählen</p>
+          <p class="formats-list">PDF, PNG, JPG, TIFF, HEIC, DOCX, XLSX</p>
+        </div>
+
+        <input type="file" ref="fileInput" accept=".pdf,.png,.jpg,.jpeg,.tiff,.tif,.heic,.docx,.xlsx"
+          @change="handleFileSelect" style="display: none;" />
+
+        <div class="status-box" :class="'status-' + status">
+          <template v-if="status === 'idle'">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            Bereit – Datei ablegen zum Starten
+          </template>
+          <template v-if="status === 'processing'">
+            <span class="spinner"></span>
+            {% raw %}{{ statusMessage || 'Wird verarbeitet...' }}{% endraw %}
+          </template>
+          <template v-if="status === 'success'">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            Erfolgreich verarbeitet
+          </template>
+          <template v-if="status === 'error'">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            {% raw %}{{ errorMessage || 'Fehler bei der Verarbeitung' }}{% endraw %}
+          </template>
+        </div>
+      </aside>
+
+      <section class="card right-panel">
+        <h2 class="card-title">Verarbeitungsergebnis</h2>
+
+        <div v-if="!hasResults" class="empty-state">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+            stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          <p>Ziehen Sie eine Rechnung in das Upload-Feld.<br>Die Verarbeitung startet automatisch.</p>
+        </div>
+
+        <template v-if="hasResults">
+          <div class="result-section">
+            <h3>Erzeugte Dateien</h3>
+            <div class="result-files">
+              <a v-if="results.xrechnung_xml" :href="results.xrechnung_xml" target="_blank" class="result-file">
+                <div class="result-file-icon xml">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                  </svg>
+                </div>
+                <div class="result-file-info">
+                  <div class="result-file-name">XRechnung (UBL 3.0.1)</div>
+                  <div class="result-file-type">XML</div>
+                </div>
+              </a>
+              <a v-if="results.zugferd_xml" :href="results.zugferd_xml" target="_blank" class="result-file">
+                <div class="result-file-icon xml">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                  </svg>
+                </div>
+                <div class="result-file-info">
+                  <div class="result-file-name">ZUGFeRD XML</div>
+                  <div class="result-file-type">XML</div>
+                </div>
+              </a>
+              <a v-if="results.zugferd_pdf" :href="results.zugferd_pdf" target="_blank" class="result-file">
+                <div class="result-file-icon pdf">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <div class="result-file-info">
+                  <div class="result-file-name">ZUGFeRD PDF/A-3</div>
+                  <div class="result-file-type">PDF mit eingebettetem XML</div>
+                </div>
+              </a>
+              <a v-if="results.canonical_json" :href="results.canonical_json" target="_blank" class="result-file">
+                <div class="result-file-icon json">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4" />
+                  </svg>
+                </div>
+                <div class="result-file-info">
+                  <div class="result-file-name">Canonical JSON</div>
+                  <div class="result-file-type">Strukturierte Rechnungsdaten</div>
+                </div>
+              </a>
+              <a v-if="results.raw_text" :href="results.raw_text" target="_blank" class="result-file">
+                <div class="result-file-icon txt">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                </div>
+                <div class="result-file-info">
+                  <div class="result-file-name">Extrahierter Text</div>
+                  <div class="result-file-type">OCR Rohtext</div>
+                </div>
+              </a>
+            </div>
+          </div>
+
+          <div v-if="results.output_directory" class="result-section">
+            <h3>Ausgabeordner</h3>
+            <p style="font-size: 13px; color: #6b7280;">{% raw %}{{ results.output_directory }}{% endraw %}</p>
+          </div>
+
+          <div class="toggle-section">
+            <button class="toggle-btn" @click="showDataPreview = !showDataPreview">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor" stroke-width="2" class="toggle-icon" :class="{ open: showDataPreview }">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
+              Extrahierte Daten anzeigen
+            </button>
+            <pre v-if="showDataPreview && extractedData"
+              class="data-preview">{% raw %}{{ JSON.stringify(extractedData, null, 2) }}{% endraw %}</pre>
+          </div>
+        </template>
+      </section>
+    </main>
+
+    <!-- Settings Modal -->
+    <div v-if="showSettings" class="modal-overlay" @click.self="showSettings = false">
+      <div class="modal-panel">
+        <div class="modal-header">
+          <h2>Einstellungen</h2>
+          <button class="modal-close" @click="showSettings = false">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <div class="modal-tabs">
+          <button class="modal-tab" :class="{ active: settingsTab === 'firma' }" @click="settingsTab = 'firma'">
+            Firmendaten
+          </button>
+          <button class="modal-tab" :class="{ active: settingsTab === 'system' }" @click="settingsTab = 'system'">
+            System
+          </button>
+        </div>
+
+        <div class="modal-content">
+          <!-- Firmendaten Tab -->
+          <template v-if="settingsTab === 'firma'">
+            <h4 class="form-section-title">Unternehmen</h4>
+            <div class="form-group">
+              <label>Firmenname</label>
+              <input type="text" v-model="firmendaten.name" placeholder="Muster GmbH">
+            </div>
+            <div class="form-group">
+              <label>USt-IdNr.</label>
+              <input type="text" v-model="firmendaten.umsatzsteuer_id" placeholder="DE123456789">
+            </div>
+            <div class="form-group">
+              <label>Steuernummer</label>
+              <input type="text" v-model="firmendaten.steuernummer" placeholder="12/345/67890">
+            </div>
+
+            <h4 class="form-section-title">Adresse</h4>
+            <div class="form-group">
+              <label>Straße</label>
+              <input type="text" v-model="firmendaten.anschrift.strasse" placeholder="Musterstraße 1">
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>PLZ</label>
+                <input type="text" v-model="firmendaten.anschrift.plz" placeholder="12345">
+              </div>
+              <div class="form-group">
+                <label>Ort</label>
+                <input type="text" v-model="firmendaten.anschrift.ort" placeholder="Musterstadt">
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Land</label>
+              <input type="text" v-model="firmendaten.anschrift.land" placeholder="DE">
+            </div>
+
+            <h4 class="form-section-title">Bankverbindung</h4>
+            <div class="form-group">
+              <label>Zahlungsart</label>
+              <select v-model="firmendaten.zahlung.zahlungsart">
+                <option value="SEPA">SEPA</option>
+                <option value="Überweisung">Überweisung</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>IBAN</label>
+              <input type="text" v-model="firmendaten.zahlung.iban" placeholder="DE89 3704 0044 0532 0130 00">
+            </div>
+            <div class="form-group">
+              <label>BIC</label>
+              <input type="text" v-model="firmendaten.zahlung.bic" placeholder="COBADEFFXXX">
+            </div>
+          </template>
+
+          <!-- System Tab -->
+          <template v-if="settingsTab === 'system'">
+            <h4 class="form-section-title">Modellpfade</h4>
+            <div class="form-group">
+              <label>LLM Modell Pfad</label>
+              <input type="text" v-model="settings.llm_model_path" placeholder="models/model.gguf">
+            </div>
+            <div class="form-group">
+              <label>CLIP Modell Pfad</label>
+              <input type="text" v-model="settings.clip_model_path" placeholder="models/clip.gguf">
+            </div>
+
+            <h4 class="form-section-title">Ausgabe</h4>
+            <div class="form-group">
+              <label>Ausgabeordner</label>
+              <input type="text" v-model="settings.output_directory" placeholder="output">
+            </div>
+            <div class="form-group">
+              <label>Logo Pfad (optional)</label>
+              <input type="text" v-model="settings.logo_path" placeholder="resources/logo.png">
+            </div>
+          </template>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn btn-secondary" @click="showSettings = false">Abbrechen</button>
+          <button class="btn btn-primary" @click="saveSettings">Speichern</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast -->
+    <div v-if="toast.show" class="toast" :class="'toast-' + toast.type">
+      {% raw %}{{ toast.message }}{% endraw %}
+    </div>
+  </div>
+
+  <script>
+    const { createApp } = Vue;
+
+    createApp({
+      data() {
+        return {
+          isDragging: false,
+          status: 'idle',
+          statusMessage: '',
+          errorMessage: '',
+          hasResults: false,
+          results: {},
+          extractedData: null,
+          showDataPreview: false,
+          showSettings: false,
+          settingsTab: 'firma',
+          firmendaten: {
+            name: '',
+            umsatzsteuer_id: '',
+            steuernummer: '',
+            anschrift: {
+              strasse: '',
+              plz: '',
+              ort: '',
+              land: 'DE'
+            },
+            zahlung: {
+              zahlungsart: 'SEPA',
+              iban: '',
+              bic: ''
+            }
+          },
+          settings: {
+            llm_model_path: '',
+            clip_model_path: '',
+            output_directory: '',
+            logo_path: ''
+          },
+          toast: {
+            show: false,
+            message: '',
+            type: 'success'
+          }
+        };
+      },
+      mounted() {
+        this.loadSettings();
+        this.loadFirmendaten();
+      },
+      methods: {
+        triggerFileInput() {
+          if (this.status !== 'processing') {
+            this.$refs.fileInput.click();
+          }
+        },
+        handleFileSelect(event) {
+          const file = event.target.files[0];
+          if (file) {
+            this.processFile(file);
+          }
+        },
+        handleDrop(event) {
+          this.isDragging = false;
+          if (this.status === 'processing') return;
+
+          const file = event.dataTransfer.files[0];
+          if (file) {
+            this.processFile(file);
+          }
+        },
+        async processFile(file) {
+          this.status = 'processing';
+          this.statusMessage = 'Datei wird hochgeladen...';
+          this.hasResults = false;
+          this.results = {};
+          this.extractedData = null;
+
+          const formData = new FormData();
+          formData.append('file', file);
+
+          try {
+            this.statusMessage = 'Rechnung wird analysiert...';
+
+            const response = await fetch('/api/process', {
+              method: 'POST',
+              body: formData
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+              throw new Error(data.detail || 'Verarbeitung fehlgeschlagen');
+            }
+
+            this.results = {
+              xrechnung_xml: data.files?.xrechnung_xml,
+              zugferd_xml: data.files?.zugferd_xml,
+              zugferd_pdf: data.files?.zugferd_pdf,
+              canonical_json: data.files?.canonical_json,
+              raw_text: data.files?.raw_text,
+              output_directory: data.output_directory
+            };
+
+            this.extractedData = data.invoice_data || null;
+            this.hasResults = true;
+            this.status = 'success';
+            this.showToast('Rechnung erfolgreich verarbeitet', 'success');
+          } catch (error) {
+            console.error('Processing error:', error);
+            this.status = 'error';
+            this.errorMessage = error.message || 'Fehler bei der Verarbeitung';
+            this.showToast(this.errorMessage, 'error');
+          }
+
+          // Reset file input
+          this.$refs.fileInput.value = '';
+        },
+        async loadSettings() {
+          try {
+            const response = await fetch('/api/settings');
+            const data = await response.json();
+            this.settings = { ...this.settings, ...data };
+          } catch (error) {
+            console.error('Failed to load settings:', error);
+          }
+        },
+        async loadFirmendaten() {
+          try {
+            const response = await fetch('/api/firmendaten');
+            const data = await response.json();
+            this.firmendaten = {
+              name: data.name || '',
+              umsatzsteuer_id: data.umsatzsteuer_id || '',
+              steuernummer: data.steuernummer || '',
+              anschrift: {
+                strasse: data.anschrift?.strasse || '',
+                plz: data.anschrift?.plz || '',
+                ort: data.anschrift?.ort || '',
+                land: data.anschrift?.land || 'DE'
+              },
+              zahlung: {
+                zahlungsart: data.zahlung?.zahlungsart || 'SEPA',
+                iban: data.zahlung?.iban || '',
+                bic: data.zahlung?.bic || ''
+              }
+            };
+          } catch (error) {
+            console.error('Failed to load firmendaten:', error);
+          }
+        },
+        async saveSettings() {
+          try {
+            await fetch('/api/settings', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(this.settings)
+            });
+
+            await fetch('/api/firmendaten', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(this.firmendaten)
+            });
+
+            this.showSettings = false;
+            this.showToast('Einstellungen gespeichert', 'success');
+          } catch (error) {
+            console.error('Failed to save settings:', error);
+            this.showToast('Fehler beim Speichern', 'error');
+          }
+        },
+        showToast(message, type = 'success') {
+          this.toast = { show: true, message, type };
+          setTimeout(() => {
+            this.toast.show = false;
+          }, 3000);
+        }
+      }
+    }).mount('#app');
+  </script>
+</body>
+
+</html>

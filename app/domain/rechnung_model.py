@@ -1,13 +1,13 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, validator
 from typing import List, Optional
 from datetime import date
-
+from datetime import datetime
 
 class Anschrift(BaseModel):
     strasse: str
     plz: str
     ort: str
-    land: str = Field(..., min_length=2, max_length=2)
+    land: str = Field("DE", min_length=2, max_length=2)
 
 
 class Dokument(BaseModel):
@@ -15,7 +15,17 @@ class Dokument(BaseModel):
     rechnungsart: str
     rechnungsdatum: date
     faelligkeitsdatum: Optional[date] = None
-    waehrung: str = "EUR"
+    waehrung: Optional[str] = "EUR"
+
+    @validator('rechnungsdatum', pre=True)
+    def parse_german_date(cls, v):
+        if not v:
+            return None
+        # Accept DD.MM.YYYY format
+        try:
+            return datetime.strptime(v, "%d.%m.%Y").date()
+        except ValueError:
+            raise ValueError(f"Ungültiges Datum: {v}") 
 
 
 class Partei(BaseModel):
@@ -37,7 +47,7 @@ class Rechnungsposition(BaseModel):
     einheit: str
     einzelpreis_netto: float
     positionsbetrag_netto: float
-    umsatzsteuer: UmsatzsteuerPosition
+    umsatzsteuer: Optional[UmsatzsteuerPosition] = {"kategorie": "", "satz": 0.0}
 
 
 class UmsatzsteuerAufschluesselung(BaseModel):

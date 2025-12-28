@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent.parent.parent
 DATA_DIR = BASE_DIR / "data"
 #from ironpdf import PdfDocument, PdfAVersions
 jinja_env = Environment(loader=FileSystemLoader(BASE_DIR / "resources" / "invoice"))
-gs_base = "C:/Program Files/gs/gs10.06.0"
+gs_base = os.getenv("GHOSTSCRIPT_PATH", "C:/Program Files/gs/gs10.06.0")
 env = os.environ.copy()
 env["GS_LIB"] = f"{gs_base}/lib;{gs_base}/Resource/Init;{gs_base}/Resource/Font"
 try:

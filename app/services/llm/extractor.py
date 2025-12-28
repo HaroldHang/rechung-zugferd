@@ -9,6 +9,7 @@ from openai import OpenAI
 import os
 
 SCHEMA_PATH = Path(__file__).resolve().parents[2] / "domain" / "rechnung" / "schema.json"
+"""
 PROMPT_TEMPLATE = (
     "Du bist ein Parser für deutsche Rechnungen.\n\n"
     "AUFGABE:\n"
@@ -20,6 +21,44 @@ PROMPT_TEMPLATE = (
     "- Wenn ein Feld nicht erkennbar ist, lasse es weg\n"
     "- Berechne KEINE Summen oder Steuern\n"
     "- Erfinde keine Daten\n\n"
+    "SCHEMA:\n"
+    "<<< INSERT schema.json HERE >>>\n\n"
+    "RECHNUNGSTEXT:\n"
+    "<<< INSERT RAW TEXT HERE >>>\n"
+)
+PROMPT_TEMPLATE = (
+    "Du bist ein Parser für deutsche Rechnungen.\n\n"
+    "AUFGABE:\n"
+    "Analysiere den untenstehenden Rechnungstext und extrahiere die relevanten Rechnungsdaten.\n"
+    "Gib AUSSCHLIESSLICH ein JSON-Objekt zurück, das EXAKT dem vorgegebenen Schema entspricht.\n\n"
+    "VERBINDLICHE REGELN:\n"
+    "- Antworte NUR mit einem JSON-Objekt, ohne Einleitung, Erklärung oder Zusatztext\n"
+    "- Verwende AUSSCHLIESSLICH die im Schema definierten deutschen Feldnamen\n"
+    "- Das JSON MUSS syntaktisch valide sein\n"
+    "- JEDES Feld aus dem Schema MUSS enthalten sein\n"
+    "- Wenn ein Wert nicht eindeutig im Text erkennbar ist, setze den Wert auf einen leeren String \"\"\n"
+    "- Berechne KEINE Beträge, Steuern oder Summen\n"
+    "- Erfinde KEINE Daten\n\n"
+    "SCHEMA:\n"
+    "<<< INSERT schema.json HERE >>>\n\n"
+    "RECHNUNGSTEXT:\n"
+    "<<< INSERT RAW TEXT HERE >>>\n"
+)
+"""
+
+PROMPT_TEMPLATE = (
+    "Du bist ein Parser für deutsche Rechnungen.\n\n"
+    "AUFGABE:\n"
+    "Analysiere den folgenden Rechnungstext und extrahiere alle relevanten Rechnungsdaten.\n\n"
+    "REGELN:\n"
+    "- Gib ausschließlich ein einzelnes JSON-Objekt zurück, ohne jegliche Einleitung oder Erklärung.\n"
+    "- Verwende exakt die deutschen Feldnamen wie im Schema.\n"
+    "- Das JSON muss valide sein.\n"
+    "- JEDES Feld aus dem Schema muss im JSON enthalten sein.\n"
+    "- Wenn ein Feld im Text nicht erkennbar ist, setze seinen Wert auf einen leeren String \"\".\n"
+    "- Berechne keine Summen, Steuern oder andere Werte.\n"
+    "- Erfinde keine Daten.\n"
+    "- Antworte nur mit JSON, keine Kommentare, kein Text.\n\n"
     "SCHEMA:\n"
     "<<< INSERT schema.json HERE >>>\n\n"
     "RECHNUNGSTEXT:\n"
@@ -155,7 +194,6 @@ def extract_json_from_text(text: str) -> Union[Dict, List, None]:
         
     Returns:
         Parsed JSON object if found, None otherwise
-    """
     # Look for JSON patterns
     json_patterns = [
         r'(\{[^{}]*\{[^{}]*\}[^{}]*\})',  # Nested objects
@@ -173,6 +211,21 @@ def extract_json_from_text(text: str) -> Union[Dict, List, None]:
                 continue
     
     return None
+    """
+
+    # Regular expression to match JSON objects (from first { to last })
+    match = re.search(r'\{(?:.|\s)*\}', text)
+    if not match:
+        return {}  # No JSON found
+
+    json_str = match.group(0)
+
+    try:
+        data = json.loads(json_str)
+        return data
+    except json.JSONDecodeError:
+        # If JSON is malformed, return empty dict
+        return {}
 
 def build_prompt(raw_text: str, schema_text: str) -> str:
     return PROMPT_TEMPLATE.replace("<<< INSERT schema.json HERE >>>", schema_text).replace(
@@ -180,10 +233,11 @@ def build_prompt(raw_text: str, schema_text: str) -> str:
     )
 
 def call_llm_via_openai(prompt: str, system_prompt: str, schema_text: Dict, model: str = "gpt-4o-mini") -> str:
-    base_url = "https://api.aimlapi.com/v1"
-    api_key = os.getenv("AIMLAPI_API_KEY")
+    #base_url = "https://api.aimlapi.com/v1"
+    base_url = os.getenv("AI_API_BASE_URL")
+    api_key = os.getenv("AI_API_KEY")
     if not api_key:
-        raise ValueError("AIMLAPI_API_KEY environment variable not set")
+        raise ValueError("AI_API_KEY environment variable not set")
     client = OpenAI(
         base_url=base_url,
         api_key=api_key,
@@ -201,7 +255,7 @@ def call_llm_via_openai(prompt: str, system_prompt: str, schema_text: Dict, mode
         temperature=0.7,
         max_tokens=4096,
     )
-    print(response)
+    #print(response)
     return response.choices[0].message.content
     
 
@@ -217,17 +271,11 @@ def llm_extract_draft_json(raw_text_path: Path, model_path: Path, clip_model_pat
 
     #chat_handler = Qwen25VLChatHandler(clip_model_path=str(clip_model_path))
     #llm = Llama(model_path=str(model_path), chat_handler=chat_handler, n_ctx=4096)
+    
     llm = Llama(model_path=str(model_path), n_ctx=4096)
 
-    """
-    llm = Llama.from_pretrained(
-        repo_id="tensorblock/openbuddy-qwen2.5llamaify-7b-v23.1-200k-GGUF",
-        filename="openbuddy-qwen2.5llamaify-7b-v23.1-200k-Q2_K.gguf",
-    )
-    """
-
     print("start of prompt")
-    #output = llm.create_completion(prompt=prompt, temperature=0.7, max_tokens=4096)
+    output = llm.create_completion(prompt=prompt, temperature=0.7, max_tokens=4096)
     """
     output = llm.create_chat_completion(
         messages=[
@@ -249,8 +297,9 @@ def llm_extract_draft_json(raw_text_path: Path, model_path: Path, clip_model_pat
     print(text)
     # Ensure it's valid JSON only
     try:
+        data = extract_json_from_text(text)
         data = json.loads(text)
-        print(data)
+        #print(data)
     except Exception as e:
         # Attempt to locate JSON substring
         start = text.find("{")

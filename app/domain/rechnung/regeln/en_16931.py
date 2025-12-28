@@ -4,8 +4,10 @@ from typing import Dict, Any
 def check_basic(data: Dict[str, Any]) -> None:
     # Minimal business rules per EN 16931 context
     dokument = data.get("dokument", {})
+    """
     if dokument.get("waehrung") != "EUR":
         raise ValueError("Nur Währung EUR wird unterstützt")
+    """
 
     rechnungsart = dokument.get("rechnungsart")
     if rechnungsart not in {"RECHNUNG", "GUTSCHRIFT"}:

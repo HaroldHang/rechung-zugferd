@@ -1,7 +1,8 @@
-from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi import FastAPI, UploadFile, File, HTTPException, Request
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.templating import Jinja2Templates
 from pathlib import Path
 import uvicorn
 import shutil
@@ -17,7 +18,7 @@ from app.infrastructure.pipeline import process_input_file
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 UI_DIR = BASE_DIR / "app" / "ui"
-UI_DIR = BASE_DIR / "ui"
+#UI_DIR = BASE_DIR / "ui"
 DATA_DIR = BASE_DIR / "data"
 OUTPUT_DIR = BASE_DIR / "output"
 
@@ -34,9 +35,14 @@ app.add_middleware(
 for d in [DATA_DIR, OUTPUT_DIR, UI_DIR]:
     d.mkdir(parents=True, exist_ok=True)
 
-# Serve static UI
-app.mount("/static", StaticFiles(directory=str(UI_DIR), html=True), name="static")
+templates = Jinja2Templates(directory=UI_DIR / "html")
 
+# Serve static UI
+app.mount("/static", StaticFiles(directory=str(UI_DIR / "static"), html=True), name="static")
+
+@app.get("/", response_class=HTMLResponse)
+async def index(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
 
 @app.get("/api/settings")
 def get_settings():
