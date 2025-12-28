@@ -4,3 +4,5 @@
 /models/*.gguf
 output/**
 data/tmp
+data/einstellungen.json
+data/firmendaten.json
