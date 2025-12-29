@@ -3,8 +3,8 @@ from typing import Optional
 from PIL import Image
 import pytesseract
 from loguru import logger
-
-pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+import os
+pytesseract.pytesseract.tesseract_cmd = os.getenv("TESSERACT_PATH")
 
 def extract_image_text(input_path: Path) -> str:
     logger.info(f"OCR für Bild: {input_path}")

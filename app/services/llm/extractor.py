@@ -13,6 +13,7 @@ import requests
 import signal
 import sys
 import socket
+import threading
 
 SCHEMA_PATH = Path(__file__).resolve().parents[2] / "domain" / "rechnung" / "schema.json"
 """
@@ -266,14 +267,37 @@ def call_llm_via_openai(prompt: str, system_prompt: str, schema_text: Dict, mode
 def wait_for_port(host: str, port: int, timeout: int = 30):
     start = time.time()
     while time.time() - start < timeout:
+        """
         try:
             with socket.create_connection((host, port), timeout=1):
                 return True
         except OSError:
             time.sleep(0.5)
-    raise RuntimeError("LLM server did not start")
+
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # force IPv4
+        sock.settimeout(1)
+        try:
+            sock.connect((host, port))
+            sock.close()
+            return True
+        except (OSError, ConnectionRefusedError):
+            sock.close()
+            time.sleep(0.5)
+        """
+        for family in (socket.AF_INET, socket.AF_INET6):
+            try:
+                sock = socket.socket(family, socket.SOCK_STREAM)
+                sock.settimeout(1)
+                sock.connect((host, port))
+                sock.close()
+                return True
+            except (OSError, ConnectionRefusedError):
+                sock.close()
+        time.sleep(0.5)
+    raise RuntimeError(f"LLM server did not start on {host}:{port}")
 def start_llama_server(model_path, port=7001, n_threads=6, ctx_size=4096):
     print(sys.executable)
+    print(model_path)
     cmd = [
         sys.executable,
         "-m",
@@ -293,12 +317,16 @@ def start_llama_server(model_path, port=7001, n_threads=6, ctx_size=4096):
     )
     # Give it time to load model
     #for line in process.stdout:
-    #   print(line, end='', flush=True)
+    #  print(line, end='', flush=True)
 
     # Wait for the process to finish and get the exit code
     #process.wait()
     #time.sleep(8)
-    wait_for_port("127.0.0.1", port)
+    def stream_logs(proc):
+        for line in proc.stdout:
+            print(line, end="", flush=True)
+    threading.Thread(target=stream_logs, args=(process,), daemon=True).start()
+    wait_for_port("127.0.0.1", port) 
     print(process)
     return process
 

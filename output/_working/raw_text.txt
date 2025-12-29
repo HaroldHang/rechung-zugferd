@@ -1,52 +1,34 @@
-Muster GmbH Lange Str. 2 | 10245 Berlin
-Habermann & Söhne
-Schnurlos-Straße 81
-34131 Kassel
-Muster GmbH
-Lange Str. 2
-10245 Berlin
-+49 (0) 30 2121356
-mail@muster.de
-www.muster.de
-
+Katharina Pörnig
+Freiburgerweg 32
+8I7h435r K empten
+Logo
+Katharina Pörnig, Freiburgerweg 32, 87435 Kempten
+Café Hofer
+Hendrik Hofer
+Berliner Platz 10
+25980 Sylt
 Rechnung
-
-Rechnungs-Nr.:	M1675
-Auftrags-Nr.:	O1727
-Kommission:	Bestellung Gerstner
-Kunden-Nr.:	1068
-Bestell-Nr.:	369852
-Rechnungsdatum:		20.12.2025
-Liefer-/Leistungsdatum:	22.12.2025
-Bearbeiter:		Dorothea Schäfer
-Telefon:		030 2121359
-E-Mail:		mail@muster.de
-
-
-
-
-Lieferbedingung: frei Haus
-Zahlbar innerhalb von 14 Tagen mit 3 % Skonto oder innerhalb von 30 Tagen ohne Abzug
-
-
-
-
-
-
-
-
-
-
-
-Pos.; Art-Nr.; Bezeichnung; Menge; Einheit; Preis/Einh. (€); Gesamt (€)
-1; B-3025-078; B-3025, Farbe Grün
-Musterartikel; 1,00; Stk.; 47,00; 47,00
-2; B-0050-050; B-0050, Farbe Blau
-Musterartikel ABC; 2,00; Stk.; 36,00; 72,00
-3; A-0086-007; A-0086, Antik-Look
-Musterartikel; 1,00; Stk.; 56,00; 56,00
-3; V-13kg; Versand und Verpackung; 1,00; Stk.; 11,99; 11,99
-; ; ; ; ; ;
-; ; ; ; Summe Netto; Summe Netto; € 186,99
-; ; ; ; 19,00% USt. auf 186,99 €; 19,00% USt. auf 186,99 €; € 35,53
-; ; ; ; Endsumme; Endsumme; € 222,51
+Unsere Lieferungen/Leistungen stellen wir Ihnen wie folgt in Rechnung.
+Rechnungsnr.: Kundennr.: Datum: Lieferdatum:
+RE0297 10011 21.02.2024 21.02.2024
+Pos. Bezeichnung Menge Einheit Einzel € Gesamt €
+R
+1 Beratung 1 Stunde 450,00 450,00
+Social Media und Website optimieren
+E
+Zwischensumme (netto) 450,00
+Umsatzsteuer 19 % T 85,50
+Gesamtbetrag 535,50
+S
+Zahlbar sofort, rein netto
+U
+Vielen Dank für die gute Zusammenarbeit.
+M
+Bezahlen per PayPal Überweisen per Code
+Ganz bequem Code scannen Ganz bequem Code mit der
+oder Link verwenden. Banking-App scannen.
+https://paypal.me/itm-hansen/535.5eur
+Katharina Pörnig USt-IdNr.: DE226667742
+Freiburgerweg 32 Steuernummer: 123/123/123
+87435 Kempten
+Seite 1/1

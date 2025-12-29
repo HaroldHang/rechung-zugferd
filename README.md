@@ -14,13 +14,24 @@ Ein lokales Tool zum Extrahieren, Validieren und Exportieren von Rechnungen in X
 ## Voraussetzungen
 
 - Python 3.11 empfohlen (für stabile Wheels von pydantic / pydantic-core)
-  - Bei Python 3.14 kann `pydantic-core` aus Quelltext bauen und Rust benötigen.
-- Tesseract + Ghostscript (für OCRmyPDF und PDF/A-3)
+  - Bei Python 3.14 kann `pydantic-core` aus Quelltext bauen.
 - Ghostscript
   - Erforderlich für die Erstellung von PDF/A-3
-  - Das gs-Binary muss im PATH verfügbar sein
+  - Installieren Sie Ghostscript lokal. [Download](https://www.ghostscript.com/releases/gsdnld.html)
+- Tesseract
+  - Erforderlich für die Erstellung von PDF/A-3
+  - Installieren Sie Tesseract lokal. [Download](https://tesseract-ocr.github.io/tessdoc/Compiling.html#windows)
+- **PATH-Konfiguration**
+  - Fügen Sie die Installationspfade von Ghostscript und Tesseract zur Systemumgebungsvariable `PATH` hinzu.
+
 
 ## Installation
+
+```bash
+install.exe
+```
+
+oder
 
 ```bash
 python -m venv .venv
@@ -28,19 +39,35 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
-Falls `pydantic-core` nicht als Wheel verfügbar ist (z. B. auf Python 3.14), verwenden Sie Python 3.11 oder installieren Sie Rust / Maturin.
+### Konfiguration
+
+Erstellen Sie eine `.env`-Datei basierend auf der `.env.example` und passen Sie die Werte (z. B. `MODEL_PATH`, `LOGO_PATH`) an:
+
+```bash
+cp .env.example .env
+GHOSTSCRIPT_PATH="C:/Program Files/gs/gs10.06.0"
+TESSERACT_PATH="C:/Program Files/Tesseract-OCR/tesseract.exe"
+```
+
+
 
 ## Start
 
 ```bash
-python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
+start.exe
 ```
 
-Gehen Sie zu `http://localhost:8000/`.
+oder
+
+```bash
+fastapi dev app/main.py
+```
+
+Gehen Sie zu [`http://localhost:8000/`](http://localhost:8000/).
 
 ## Nutzung
 
-1. Einstellungen prüfen: Modellpfad (`.gguf`) und optional Logo-Pfad.
+1. Einstellungen prüfen: Modellpfad (`.gguf`) (z. B. [Qwen2.5-VL-7B-Instruct-Q5_K_M.gguf](https://huggingface.co/unsloth/Qwen2.5-VL-7B-Instruct-GGUF/resolve/main/Qwen2.5-VL-7B-Instruct-Q5_K_M.gguf?download=true)) und optional Logo-Pfad.
 2. Firmendaten erfassen (Anschrift, USt-IdNr., Zahlung).
 3. Rechnung hochladen (PDF, Bild, DOCX, XLSX, TXT/CSV).
 4. Ergebnisse: Rohtext, `canonical.json`, `xrechnung.xml`, `zugferd.xml`, `zugferd.pdf`.
@@ -52,4 +79,5 @@ Gehen Sie zu `http://localhost:8000/`.
 - Validierungsregeln: Basis gemäß EN 16931, erweiterbar unter `app/domain/rechnung/regeln`.
 
 ## Lizenz
+
 Proprietär / Intern. Keine externe Übermittlung der Daten.
