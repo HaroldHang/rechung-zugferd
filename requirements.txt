@@ -14,7 +14,7 @@ openpyxl
 pillow
 
 # --- Local LLM ---
-llama-cpp-python
+llama-cpp-python[server]
 
 # --- XML & Validation ---
 lxml
@@ -29,3 +29,4 @@ jinja2
 python-dateutil
 loguru
 openai
+requests

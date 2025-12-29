@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, validator, field_validator
 from typing import List, Optional
 from datetime import date
 from datetime import datetime
@@ -47,7 +47,12 @@ class Rechnungsposition(BaseModel):
     einheit: str
     einzelpreis_netto: float
     positionsbetrag_netto: float
-    umsatzsteuer: Optional[UmsatzsteuerPosition] = {"kategorie": "", "satz": 0.0}
+    umsatzsteuer: UmsatzsteuerPosition = Field(
+        default_factory=lambda: UmsatzsteuerPosition(
+            kategorie="",
+            satz=0.0
+        )
+    )
 
 
 class UmsatzsteuerAufschluesselung(BaseModel):
@@ -61,7 +66,13 @@ class Summen(BaseModel):
     gesamt_netto: float
     gesamt_umsatzsteuer: float
     gesamt_brutto: float
-    zahlbetrag: float
+    zahlbetrag: Optional[float] = None
+
+    @field_validator("zahlbetrag", mode="before")
+    def empty_str_to_none(cls, v):
+        if v == "":
+            return 0.0
+        return v
 
 
 class Zahlung(BaseModel):

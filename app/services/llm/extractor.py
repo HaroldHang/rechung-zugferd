@@ -7,6 +7,12 @@ import re
 from llama_cpp.llama_chat_format import Qwen25VLChatHandler
 from openai import OpenAI
 import os
+import subprocess
+import time
+import requests
+import signal
+import sys
+import socket
 
 SCHEMA_PATH = Path(__file__).resolve().parents[2] / "domain" / "rechnung" / "schema.json"
 """
@@ -257,11 +263,83 @@ def call_llm_via_openai(prompt: str, system_prompt: str, schema_text: Dict, mode
     )
     #print(response)
     return response.choices[0].message.content
-    
+def wait_for_port(host: str, port: int, timeout: int = 30):
+    start = time.time()
+    while time.time() - start < timeout:
+        try:
+            with socket.create_connection((host, port), timeout=1):
+                return True
+        except OSError:
+            time.sleep(0.5)
+    raise RuntimeError("LLM server did not start")
+def start_llama_server(model_path, port=7001, n_threads=6, ctx_size=4096):
+    print(sys.executable)
+    cmd = [
+        sys.executable,
+        "-m",
+        "llama_cpp.server",
+        "--model", str(model_path),
+        "--host", "127.0.0.1",
+        "--port", str(port),
+        "--n_threads", str(n_threads),
+        "--n_ctx", str(ctx_size),
+    ]
+    process = subprocess.Popen(
+        cmd,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        bufsize=1,
+        text=True,
+    )
+    # Give it time to load model
+    #for line in process.stdout:
+    #   print(line, end='', flush=True)
+
+    # Wait for the process to finish and get the exit code
+    #process.wait()
+    #time.sleep(8)
+    wait_for_port("127.0.0.1", port)
+    print(process)
+    return process
+
+def call_llama(prompt, port=7001):
+    payload = {
+        "model": "local",
+        "messages": [
+            {
+                "role": "system",
+                "content": (
+                    "Du bist ein Parser für deutsche Rechnungen.\n"
+                    "Antworte ausschließlich mit einem gültigen JSON-Objekt.\n"
+                    "Kein Text außerhalb des JSON."
+                ),
+            },
+            {"role": "user", "content": prompt},
+        ],
+        "temperature": 0.7,
+        "max_tokens": 4096,
+    }
+
+    r = requests.post(
+        f"http://127.0.0.1:{port}/v1/chat/completions",
+        json=payload,
+        timeout=3600,
+    )
+    r.raise_for_status()
+    response = r.json()
+    print(response)
+    return response["choices"][0]["message"]["content"]
+
+def stop_llama_server(process):
+    process.terminate()
+    try:
+        process.wait(timeout=10)
+    except subprocess.TimeoutExpired:
+        process.kill()
+
 
 def llm_extract_draft_json(raw_text_path: Path, model_path: Path, clip_model_path: Path) -> Dict[str, Any]:
     logger.info("Starte LLM für strukturierte JSON-Extraktion")
-
     schema_text = SCHEMA_PATH.read_text(encoding="utf-8")
     raw_text = Path(raw_text_path).read_text(encoding="utf-8", errors="ignore")
     prompt = build_prompt(raw_text, schema_text)
@@ -272,10 +350,10 @@ def llm_extract_draft_json(raw_text_path: Path, model_path: Path, clip_model_pat
     #chat_handler = Qwen25VLChatHandler(clip_model_path=str(clip_model_path))
     #llm = Llama(model_path=str(model_path), chat_handler=chat_handler, n_ctx=4096)
     
-    llm = Llama(model_path=str(model_path), n_ctx=4096)
-
+    #llm = Llama(model_path=str(model_path), n_ctx=4096)
+    process = start_llama_server(model_path)
     print("start of prompt")
-    output = llm.create_completion(prompt=prompt, temperature=0.7, max_tokens=4096)
+    #output = llm.create_completion(prompt=prompt, temperature=0.7, max_tokens=4096)
     """
     output = llm.create_chat_completion(
         messages=[
@@ -290,10 +368,16 @@ def llm_extract_draft_json(raw_text_path: Path, model_path: Path, clip_model_pat
         max_tokens=4096,
     )
     """
-    text = output["choices"][0]["text"].strip()
-    text = clean_json_string(text)
-    text = extract_json_from_text(text)
+    #text = output["choices"][0]["text"].strip()
+    #text = clean_json_string(text)
+    #text = extract_json_from_text(text)
     #text = call_llm_via_openai(prompt, "Du bist ein Parser für deutsche Rechnungen, der das Ergebnis in strukturiertem JSON liefert..", json.dumps(schema_text),)
+    try:
+        text = call_llama(prompt)
+    except Exception as e:
+        raise ValueError(f"LLM lieferte kein valides JSON:\n {e}")
+    finally:
+        stop_llama_server(process)
     print(text)
     # Ensure it's valid JSON only
     try:
