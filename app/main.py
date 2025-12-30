@@ -39,6 +39,7 @@ templates = Jinja2Templates(directory=UI_DIR / "html")
 
 # Serve static UI
 app.mount("/static", StaticFiles(directory=str(UI_DIR / "static"), html=True), name="static")
+app.mount("/output", StaticFiles(directory=str(OUTPUT_DIR)), name="output")
 
 @app.get("/", response_class=HTMLResponse)
 async def index(request: Request):

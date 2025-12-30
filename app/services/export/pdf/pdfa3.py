@@ -153,14 +153,14 @@ def _convert_to_pdfa3_ghostscript(input_pdf: str, output_pdf: str) -> bool:
     # 1. Absolute paths are safer; ensure they use forward slashes for GS
     input_pdf = os.path.abspath(input_pdf).replace("\\", "/")
     output_pdf = os.path.abspath(output_pdf).replace("\\", "/")
-    gs_exe = "gswin64c.exe"
+    #gs_exe = "gswin64c.exe"
     icc_profile = str(Path(__file__).parent.parent.parent.parent.parent / "resources" / "srgb.icc")
     print(icc_profile)
     if not os.path.exists(icc_profile):
         logger.error(f"ICC profile not found: {icc_profile}") 
         return False
     cmd = [
-        gs_exe,
+        gs_base,
         #"-dNOSAFER",
         "-dPDFA=3",
         "-dBATCH",

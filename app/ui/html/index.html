@@ -632,7 +632,7 @@
           <div class="result-section">
             <h3>Erzeugte Dateien</h3>
             <div class="result-files">
-              <a v-if="results.xrechnung_xml" :href="results.xrechnung_xml" target="_blank" class="result-file">
+              <a v-if="results.xrechnung_xml" :href="getPathLink(results.xrechnung_xml)" target="_blank" class="result-file">
                 <div class="result-file-icon xml">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor" stroke-width="2">
@@ -644,7 +644,7 @@
                   <div class="result-file-type">XML</div>
                 </div>
               </a>
-              <a v-if="results.zugferd_xml" :href="results.zugferd_xml" target="_blank" class="result-file">
+              <a v-if="results.zugferd_xml" :href="getPathLink(results.zugferd_xml)" target="_blank" class="result-file">
                 <div class="result-file-icon xml">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor" stroke-width="2">
@@ -656,7 +656,7 @@
                   <div class="result-file-type">XML</div>
                 </div>
               </a>
-              <a v-if="results.zugferd_pdf" :href="results.zugferd_pdf" target="_blank" class="result-file">
+              <a v-if="results.zugferd_pdf" :href="getPathLink(results.zugferd_pdf)" target="_blank" class="result-file">
                 <div class="result-file-icon pdf">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor" stroke-width="2">
@@ -669,7 +669,7 @@
                   <div class="result-file-type">PDF mit eingebettetem XML</div>
                 </div>
               </a>
-              <a v-if="results.canonical_json" :href="results.canonical_json" target="_blank" class="result-file">
+              <a v-if="results.canonical_json" :href="getPathLink(results.canonical_json)" target="_blank" class="result-file">
                 <div class="result-file-icon json">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor" stroke-width="2">
@@ -682,7 +682,7 @@
                   <div class="result-file-type">Strukturierte Rechnungsdaten</div>
                 </div>
               </a>
-              <a v-if="results.raw_text" :href="results.raw_text" target="_blank" class="result-file">
+              <a v-if="results.raw_text" :href="getPathLink(results.raw_text)" target="_blank" class="result-file">
                 <div class="result-file-icon txt">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor" stroke-width="2">
@@ -1008,6 +1008,9 @@
           setTimeout(() => {
             this.toast.show = false;
           }, 3000);
+        },
+        getPathLink(path) {
+          return '/output/' + path.split(/output[\\\/]/).pop();
         }
       }
     }).mount('#app');
